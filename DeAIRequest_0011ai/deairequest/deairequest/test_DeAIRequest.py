@@ -45,7 +45,7 @@ class TestDeAIRequest(unittest.TestCase):
                 api.close()
         #bp.add_dataset(bp.get_ipfs_data_type(),cid,True)
         bp.add_dataset(bp.get_ipfs_data_type(),cid,False)
-        bp.add_dataset(bp.get_ipfs_data_type(),'ipfs://Qmcmb4MU4BN727xKoodGgpoeRAiiua2DwPYMSUDPZitMn1:/data', False)
+        bp.add_dataset(bp.get_ipfs_data_type(),'ipfs://Qmcmb4MU4BN727xKoodGgpoeRAiiua2DwPYMSUDPZitMn1:data', False)
         job = bp.submit_job(os.path.join(path,Path("test2.ipynb")))
         self.assertNotEmpty(job)
         state=bp.get_state(job)
@@ -109,7 +109,6 @@ class TestDeAIRequest(unittest.TestCase):
         bp.set_docker_image("amaksimov/python_data_science:latest")
         path = os.path.abspath(os.path.dirname(__file__))
         job = bp.submit_job(os.path.join(path,Path("test.ipynb")))
-        #print(job)
         self.assertNotEmpty(job)
         state=bp.get_state(job)
         while state=="InProgress":
@@ -166,7 +165,7 @@ class TestDeAIRequest(unittest.TestCase):
                 self.assertTrue(exists(os.path.join("temp",directory,"outputs")))
         finally:
             shutil.rmtree("temp")
-
+            
         
         
 

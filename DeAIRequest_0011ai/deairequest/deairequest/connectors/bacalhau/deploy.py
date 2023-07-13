@@ -32,36 +32,10 @@ def deploy(base_path: Path, root_file: str, config: dict):
         raise RuntimeError(f"The 'bacalhau' backend gave an error: {err}")
 
     # Result is a JSON blob describing the 'job' execution context:
-    #data = json.loads(res.to_str())
-    #print(f"Successfully started an execution of notebook '{config.get('notebook').get('name')}', visit the following link for results:\n\t{res.job.metadata.id}")
-
+    #print(res)
     return res.job.metadata.id
     
 def create_job(config: dict, base_path: Path, root_file: str) -> str:
-    # use the requirements md5 hash to see if an image is already available
-    #requirements=os.path.join(base_path,root_file,"requirements.txt")
-    #openedFile=open(requirements,"r",encoding='utf-8')
-    #readFile=openedFile.read()
-    #readFile="python:3.9-slim:"+readFile
-    #md5Hash = hashlib.md5(readFile.encode('utf-8'))
-    #md5Hashed = md5Hash.hexdigest()
-    #client = docker.from_env()
-    #try:
-    #    print(f"pulling:{md5Hashed}")
-    #    client.images.pull(md5Hashed)
-    #    print(f"pull worked")
-    #except docker.errors.ImageNotFound:
-    #    dockerpath = os.path.join(os.path.dirname(os.path.realpath(__file__)),"Dockerfile")
-    #    print(f"docker:{dockerpath}")                          
-    #    client.images.build(
-    #        path = os.path.join(base_path,root_file), 
-    #        dockerfile=dockerpath,
-    #        tag=md5Hashed+":lastest",
-    #    )
-
-    #    print(f'user:{config.get("runtime_options").get("docker_user")}')  
-    #    print(f'pwd:{config.get("runtime_options").get("docker_password")}')
-        #client.push.
     datasets=_generateStorageSpec(config)
 
     requirements=os.path.join(base_path,"inputs/requirements.txt")
@@ -80,22 +54,29 @@ def create_job(config: dict, base_path: Path, root_file: str) -> str:
                     ))
             datasets.append(
                     StorageSpec(
-                        storage_source="Inline",
-                        path="/inputs",
-                        url=_encode_tar_gzip(base_path,"inputs"),
+                        storage_source="IPFS",
+                        path="/inputs/requirements.txt",
+                        cid=_encode_as_cid(base_path,"inputs","requirements.txt"),
+                    ))
+            datasets.append(
+                    StorageSpec(
+                        storage_source="IPFS",
+                        path="/inputs/code.py",
+                        cid=_encode_as_cid(base_path,"inputs","code.py"),
     
                     ))
-        command=["/bin/sh","-c","pip3 install --no-index --find-links /wheels -r /inputs/inputs/requirements.txt;mv /inputs/inputs/code.py /inputs/code.py;python3 /inputs/code.py"]
+
+        command=["/bin/sh","-c","pip3 install --no-index --find-links /wheels -r /inputs/requirements.txt;python3 /inputs/code.py"]
     else:
         if datasets != {}:
             datasets.append(
                     StorageSpec(
-                        storage_source="Inline",
-                        path="/inputs",
-                        url=_encode_tar_gzip(base_path,"inputs"),
+                        storage_source="IPFS",
+                        path="/inputs/code.py",
+                        cid=_encode_as_cid(base_path,"inputs","code.py"),
     
                     ),)
-        command=["/bin/sh","-c","mv /inputs/inputs/code.py /inputs/code.py;python3 /inputs/code.py"]
+        command=["/bin/sh","-c","python3 /inputs/code.py"]
 
 
     data = dict(
@@ -140,10 +121,25 @@ def _download_wheels(dir: Path, reqs: Path) -> str:
         api = ipfshttpclient.connect()
         cid = api.add(wheelsdir)
     finally:
-        if api != None:
+        try:
             api.close()
+        except:
+            pass
     return cid
     
+
+def _encode_as_cid(dir: Path, dir2: str, name: str) -> str:
+    dir=os.path.join(dir,dir2, name)
+    try:
+        api = ipfshttpclient.connect()
+        cid = api.add(dir)
+    finally:
+        try:
+            api.close()
+        except:
+            pass
+
+    return cid['Hash']
 
 def _encode_tar_gzip(dir: Path, name: str) -> str:
     """Encodes the given data as an urlsafe base64 string."""
@@ -182,8 +178,10 @@ def _generateStorageSpec(config:dict) -> list:
                 else:
                     cid=cid.as_json().get("Hash")
             finally:
-                if api != None:
+                try:
                     api.close()
+                except:
+                    pass
             ss.append(StorageSpec(
                     storage_source="IPFS",
                     path="/inputs/"+os.path.basename(value),

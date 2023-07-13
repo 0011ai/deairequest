@@ -276,6 +276,9 @@ class BacalhauProtocol(DeProtocol):
                 os.mkdir(output)
             api.get(cid,output)
         finally:
-            api.close()
+            try:
+                api.close()
+            except:
+                pass
 
     
