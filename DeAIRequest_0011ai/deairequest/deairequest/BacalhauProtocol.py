@@ -17,6 +17,9 @@ class BacalhauProtocol(DeProtocol):
     docker_image = ""
     datasets = list(dict())
     encrypt = True
+    cpu = "2"
+    memory = "2Gb"
+    gpu = "1"
 
     """
     Get the type of protocol that is used
@@ -48,6 +51,66 @@ class BacalhauProtocol(DeProtocol):
     def get_ext(self)->str:
         return "bhl"
     
+    """
+    Get the cpu
+    @oaram self:
+    @preturn: the cpu
+    @raise: exception is thrown if no extension is supported
+    """
+    @classmethod
+    def get_cpu(self)->str:
+        return self.cpu
+    
+    """
+    set the cpu
+    @oaram self:
+    @param: the cpu
+    @raise: exception is thrown if no extension is supported
+    """
+    @classmethod
+    def set_cpu(self, cpu:str):
+        self.cpu=cpu
+    
+    """
+    Get the gpu
+    @oaram self:
+    @preturn: the gpu
+    @raise: exception is thrown if no extension is supported
+    """
+    @classmethod
+    def get_gpu(self)->str:
+        return self.gpu
+    
+    """
+    set the gpu
+    @oaram self:
+    @param: the gpu
+    @raise: exception is thrown if no extension is supported
+    """
+    @classmethod
+    def set_gpu(self, gpu:str):
+        self.gpu=gpu
+    
+    """
+    Get the memory
+    @oaram self:
+    @preturn: the memory
+    @raise: exception is thrown if no extension is supported
+    """
+    @classmethod
+    def get_memory(self)->str:
+        return self.memory
+    
+    """
+    set the memory
+    @oaram self:
+    @param: the memory
+    @raise: exception is thrown if no extension is supported
+    """
+    @classmethod
+    def set_memory(self, memory:str):
+        self.memory=memory
+
     """
     Get all the supported data types of this type of protocol
     @oaram self:
@@ -234,7 +297,7 @@ class BacalhauProtocol(DeProtocol):
         name=os.path.basename(ipynb)
         name=name.replace('.ipynb','')
         pythonversion=self.docker_images_pyv[self.get_docker_image()]
-        return bcljob.main(ipynb,name,self.get_docker_image(),pythonversion,self.datasets)
+        return bcljob.main(ipynb,name,self.get_docker_image(),pythonversion,self.datasets, self.cpu,self.gpu,self.memory)
     
     """
     Get the logs from the job

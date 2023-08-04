@@ -1,18 +1,27 @@
-from torch.utils.data import Dataset
-from torch.utils.data import DataLoader
 from os import path
 
 
-class sdk_torch():
-    remote=False
+class sdk_data():
+    urls=[]
+    files=[]
 
-    def set_remote(self,remote: bool):
-        self.remote=remote
+    def add_data(self,url:str, encrypt_remote: True):
+        self.urls.append({"url":url,"encrypt":encrypt_remote})
 
-    def get_remote(self)->bool:
-        return self.remote
-    def get_data(source: str, encrypt_remote: True)->Dataset:
-        pass
+    def add_data(self,data:path, encrypt_remote: True):
+        self.files.append({"file":data,"encrypt":encrypt_remote})
+        
+    def write_json(self,notebook:str):
+        try:
+            f = open(notebook+".data","w")
+            f.write('{\n')
+            for url in self.urls:
+                f.write("   {'url':{'name':%s,'encrypt':%s}}\n" % (url["url"],url("encrypt")))
+            for file in self.files:
+                f.write("   {'file':{'name':%s,'encrypt':%s}}\n" % (file["file"],file("encrypt")))
+            f.write('\n}')
+        finally:
+            if f != None:
+                f.close()
 
-    def load_data(source: str, encrypt_remote: True)->DataLoader:
-        pass
+

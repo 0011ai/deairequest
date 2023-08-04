@@ -92,7 +92,9 @@ def create_job(config: dict, base_path: Path, root_file: str) -> str:
                 working_directory="/inputs",
             ),
             resources=ResourceUsageConfig(
-                gpu="1",
+                gpu=config.get('resources').get('gpu'),
+                cpu=config.get('resources').get('cpu'),
+                memory=config.get('resources').get('memory'),
             ),
             inputs=datasets
             ,
