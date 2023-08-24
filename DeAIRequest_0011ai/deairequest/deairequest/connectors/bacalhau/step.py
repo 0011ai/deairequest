@@ -25,6 +25,14 @@ schema = {
         "required": True,
         "schema": {"type": "string"},
     },
+    "resources": {
+        "type": "list",
+        "required": False,
+        "schema": {"type": "string"},
+        #"cpu": {"type": "string"},
+        #"gpu": {"type": "string"},
+        #"memory": {"type": "string"},
+    },
 
     # For preserving unique names when serialising step objects.
     "unique_name": {"type": "string"},

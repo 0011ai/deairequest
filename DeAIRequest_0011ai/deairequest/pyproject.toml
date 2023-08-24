@@ -1,6 +1,6 @@
 [project]
 name = "deairequest"
-version = "0.0.16"
+version = "0.0.17"
 authors = [
   { name="Maarten Ectors", email="maarten@0011.ai" }
 ]
@@ -20,7 +20,13 @@ classifiers = [
 requires = [
     "setuptools>=61.0",
     "requests",
-    "build"
+    "build",
+    "python-box>=5.4.1",
+    "bacalhau_sdk>=1.0.3",
+    "ipfshttpclient>=0.8.0a2",
+    "pipreqs>=0.4.13",
+    "Cerberus>=1.3.4",
+    "jupytext>=1.11.5"
 ]
 
 build-backend = "setuptools.build_meta"
