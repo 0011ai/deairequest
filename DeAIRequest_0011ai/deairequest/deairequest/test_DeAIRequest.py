@@ -140,6 +140,7 @@ class TestDeAIRequest(unittest.TestCase):
         job = bp.submit_job(os.path.join(path,Path("test.ipynb")))
         self.assertNotEmpty(job)
         state=bp.get_state(job)
+
         while state=="InProgress":
             time.sleep(0.25)
             state=bp.get_state(job)
