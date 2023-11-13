@@ -48,17 +48,17 @@ def query(docker: str):
 
     # get the python version and requirements.txt job running on the docker
     res = submit(data)
+    #print(res)
     # get the job id and wait until it changes from state in progress to either completed or error
     id = res.job.metadata.id
     state=states(job_id=id).state.state
-    while state == 'InProgress':
+    while state == 'New' or state == 'InProgress' :
         state=states(job_id=id).state.state
         #print('.',end='')
         time.sleep(0.25)
     
     if state=="Error":
         raise Exception(f"Sorry but we cannot download and inspect the docker image: {docker}, please use a different docker image.")
-    
     # get the result of the Bacalhau job
     resultout=results(job_id=id)
     cid=resultout.results[0].data.cid
